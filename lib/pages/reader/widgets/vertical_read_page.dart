@@ -25,7 +25,7 @@ class _VerticalReadPageState extends State<VerticalReadPage> with WidgetsBinding
   String text = "";
   List<String> images = [];
 
-  TextStyle textStyle = const TextStyle();
+  TextStyle textStyle = TextStyle();
   EdgeInsets padding = EdgeInsets.zero;
 
   double position = 0;
@@ -139,6 +139,7 @@ class _VerticalReadPageState extends State<VerticalReadPage> with WidgetsBinding
       s.height,
       s.letterSpacing,
       s.wordSpacing,
+      s.color?.toARGB32(),
       p.left,
       p.right,
       p.top,
