@@ -25,12 +25,12 @@ class ReaderPage extends StatelessWidget {
 
   final GlobalKey<VerticalReadPageState> _verticalReadPageKey = GlobalKey();
 
-  EdgeInsets get padding => EdgeInsets.fromLTRB(
+  EdgeInsets _contentPadding(BuildContext context, {required bool inPageStatusBar}) => EdgeInsets.fromLTRB(
     controller.readerSettingsState.value.leftMargin,
     controller.readerSettingsState.value.topMargin,
     controller.readerSettingsState.value.rightMargin,
-    controller.readerSettingsState.value.showStatusBar && !controller.readerSettingsState.value.immersionMode
-        ? controller.readerSettingsState.value.bottomMargin + kStatusBarPadding
+    controller.readerSettingsState.value.showStatusBar
+        ? controller.readerSettingsState.value.bottomMargin + kStatusBarPadding + (inPageStatusBar ? MediaQuery.of(context).padding.bottom : 0)
         : controller.readerSettingsState.value.bottomMargin,
   );
 
@@ -43,12 +43,12 @@ class ReaderPage extends StatelessWidget {
 
   bool _useOverlayBottomStatusBar() {
     final settings = controller.readerSettingsState.value;
-    return settings.showStatusBar && !settings.immersionMode && settings.direction == ReaderDirection.upToDown;
+    return settings.showStatusBar && settings.direction == ReaderDirection.upToDown;
   }
 
   bool _useInPageBottomStatusBar() {
     final settings = controller.readerSettingsState.value;
-    return settings.showStatusBar && !settings.immersionMode && settings.direction != ReaderDirection.upToDown;
+    return settings.showStatusBar && settings.direction != ReaderDirection.upToDown;
   }
 
   @override
@@ -229,7 +229,7 @@ class ReaderPage extends StatelessWidget {
             controller.text.value,
             controller.images,
             initialOffset: controller.initialVerticalOffset,
-            padding: padding,
+            padding: _contentPadding(context, inPageStatusBar: false),
             style: textStyle,
             paraSpacing: controller.readerSettingsState.value.readerParaSpacing,
             paraIndent: controller.readerSettingsState.value.readerParaIndent,
@@ -255,7 +255,7 @@ class ReaderPage extends StatelessWidget {
       controller.text.value,
       controller.images,
       initIndex: controller.initialHorizontalIndex,
-      padding: padding,
+      padding: _contentPadding(context, inPageStatusBar: _useInPageBottomStatusBar()),
       style: textStyle,
       reverse: controller.readerSettingsState.value.direction == ReaderDirection.rightToLeft,
       isDualPage: controller.isDualPage,
@@ -472,11 +472,12 @@ class ReaderPage extends StatelessWidget {
   }
 
   Widget _buildInPageStatusBar(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
     return SizedBox(
       width: double.infinity,
-      height: kStatusBarPadding.toDouble(),
+      height: kStatusBarPadding.toDouble() + bottomInset,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: EdgeInsets.fromLTRB(12, 0, 12, bottomInset),
         child: _buildStatusBarContent(context),
       ),
     );
